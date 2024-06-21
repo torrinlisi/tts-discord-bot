@@ -4,14 +4,18 @@ import { Client, Intents } from "discord.js";
 import dotenv from "dotenv";
 
 import { Ping } from "./commands/ping";
+import { Voices } from "./commands/voices";
+import { TTS } from "./commands/tts";
 
 dotenv.config();
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES],
+});
 const TOKEN: any = process.env["TOKEN"];
 // for testing only
 const TEST_GUILD_ID = process.env["TEST_GUILD_ID"] || "";
 
-const commands = [Ping];
+const commands = [Ping, Voices, TTS];
 
 // When the client is ready, this only runs once
 client.once("ready", async () => {
@@ -19,7 +23,7 @@ client.once("ready", async () => {
   client.user?.setActivity(``);
   client.user?.setUsername("D&D TTS");
   client.user?.setAvatar("./tempAIAvatar.jpg");
-  // client.guilds.cache.get(TEST_GUILD_ID)?.setName("D&D TTS");
+  client.guilds.cache.get(TEST_GUILD_ID)?.setName("D&D TTS");
   // Registering the commands in the client
   const CLIENT_ID = client.user?.id;
   const rest = new REST({ version: "9" }).setToken(TOKEN);
