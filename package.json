@@ -1,0 +1,27 @@
+{
+  "name": "dnd-tts-discord-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "node index.ts",
+    "dev": "nodemon -L index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^0.13.0",
+    "@discordjs/rest": "^0.4.1",
+    "axios": "^0.26.1",
+    "discord-api-types": "^0.31.2",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "pg": "^8.7.3",
+    "typescript": "^5.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4",
+    "ts-node": "^10.9.2"
+  }
+}
