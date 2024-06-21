@@ -20,13 +20,37 @@ export const TTS = {
         .setName("voice")
         .setRequired(true)
         .setDescription("The voice to use")
+        .addChoices(
+          { name: "Default Female Voice", value: "21m00Tcm4TlvDq8ikWAM" },
+          { name: "Default Male Voice", value: "29vD33N1CtxCmqQRPOHJ" },
+          {
+            name: "Female Radio/Stream Voice (I guess)",
+            value: "z9fAnlkpzviPz146aGWa",
+          }
+        )
     )
     .addStringOption((option) =>
       option
         .setName("text")
         .setRequired(true)
         .setDescription("The text to send to tts")
+    )
+
+    .addStringOption((option) =>
+      option
+        .setName("stability")
+        .setRequired(false)
+        .setDescription("How emotional the voice is")
+        .addChoices(
+          { name: "Low", value: ".8" },
+          { name: "Normal", value: ".5" },
+          {
+            name: "High",
+            value: ".1",
+          }
+        )
     ),
+
   execute: async (interaction: any) => {
     const elevenLabsURL = `https://api.elevenlabs.io/v1/text-to-speech/${interaction.options.getString(
       "voice"
@@ -42,10 +66,10 @@ export const TTS = {
       text: interaction.options.getString("text"),
       model_id: "eleven_multilingual_v2",
       voice_settings: {
-        stability: 0.5,
+        stability: interaction.options.getString("stability") || ".5",
         similarity_boost: 0.8,
         style: 0.0,
-        use_speaker_boost: true,
+        use_speaker_boost: false,
       },
     };
 
