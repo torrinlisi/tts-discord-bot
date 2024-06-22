@@ -8,3 +8,4 @@ TODO
 - Add more dnd specific commands
 - Improve TTS to offer more flexibility
 - Potential memory leak... oopsie
+- Add cap to text size so someone doesn't waste and entire budget
