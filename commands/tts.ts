@@ -45,11 +45,28 @@ export const TTS = {
         .setRequired(false)
         .setDescription("How emotional the voice is")
         .addChoices(
-          { name: "Low", value: ".8" },
+          { name: "High", value: ".8" },
           { name: "Normal", value: ".5" },
           {
-            name: "High",
+            name: "Low",
             value: ".1",
+          }
+        )
+    )
+
+    .addStringOption((option) =>
+      option
+        .setName("style")
+        .setRequired(false)
+        .setDescription("How emotional the voice is")
+        .addChoices(
+          { name: "Wild", value: "1.0" },
+          { name: "Medium Wild", value: ".75" },
+          { name: "Kinda Wild", value: ".5" },
+          { name: "Weird", value: ".25" },
+          {
+            name: "Normal",
+            value: "0.0",
           }
         )
     ),
@@ -80,7 +97,7 @@ export const TTS = {
         voice_settings: {
           stability: interaction.options.getString("stability") || ".5",
           similarity_boost: 0.8,
-          style: 0.0,
+          style: Number(interaction.options.getString("style")) || 0.0,
           use_speaker_boost: false,
         },
       };
@@ -138,6 +155,9 @@ export const TTS = {
 
             connection.subscribe(player);
             player.play(audio);
+
+            // TODO: figure this out
+            // connection.destroy();
           } else {
             console.error("Channel not found or not a voice channel");
           }
