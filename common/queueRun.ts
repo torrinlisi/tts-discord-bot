@@ -2,16 +2,22 @@ import {
   AudioPlayerStatus,
   createAudioPlayer,
   createAudioResource,
+  DiscordGatewayAdapterCreator,
   joinVoiceChannel,
+  VoiceConnection,
+  VoiceConnectionStatus,
 } from "@discordjs/voice";
 import axios from "axios";
 import { randomUUID } from "crypto";
+import { CommandInteraction, Guild, GuildBasedChannel } from "discord.js";
 import { createWriteStream, unlink } from "fs";
+
+let voiceConnection: VoiceConnection;
 
 export const queueRunner = async () => {
   while (true) {
     if ((global as any).queue.length > 0) {
-      const interaction = (global as any).queue.shift();
+      const interaction: CommandInteraction = (global as any).queue.shift();
 
       const elevenLabsURL = `https://api.elevenlabs.io/v1/text-to-speech/${interaction.options.getString(
         "voice"
@@ -29,7 +35,7 @@ export const queueRunner = async () => {
         voice_settings: {
           stability: interaction.options.getString("stability") || ".5",
           similarity_boost: 0.8,
-          style: Number(interaction.options.getString("style")) || 0.0,
+          style: Number(interaction.options.getString("style")) || ".5",
           use_speaker_boost: false,
         },
       };
@@ -53,22 +59,21 @@ export const queueRunner = async () => {
           });
 
           const guild = await interaction.client.guilds.fetch(
-            process.env.TEST_GUILD_ID
+            process.env.TEST_GUILD_ID as string
           );
-          const channel: any = guild.channels.cache.get(
-            process.env.VOICE_CHANNEL_ID
+          const channel = guild.channels.cache.get(
+            process.env.VOICE_CHANNEL_ID as string
           );
 
           if (channel && channel.isVoice()) {
             // Join the voice channel
-            const connection = joinVoiceChannel({
-              channelId: channel.id,
-              guildId: guild.id,
-              adapterCreator: channel.guild.voiceAdapterCreator,
-              selfDeaf: false,
-            });
+            const connection = joinVoiceChannelIfNeeded(
+              channel,
+              guild,
+              interaction.client
+            );
 
-            connection.on("error", (error) => {
+            connection.on("error", (error: any) => {
               console.error("Error with the connection:", error);
             });
 
@@ -88,9 +93,7 @@ export const queueRunner = async () => {
             connection.subscribe(player);
             player.play(audio);
 
-            // TODO: figure this out
-            // connection.destroy();
-            // connection.destroy()
+            player.removeAllListeners();
           } else {
             console.error("Channel not found or not a voice channel");
           }
@@ -110,11 +113,39 @@ export const queueRunner = async () => {
         });
       }
     } else {
-      await timeout(2000);
+      await timeout(1000);
     }
   }
 };
 
 const timeout = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const joinVoiceChannelIfNeeded = (
+  channel: GuildBasedChannel,
+  guild: Guild,
+  client: any
+) => {
+  if (voiceConnection) {
+    console.log("Already connected to a voice channel.");
+    return voiceConnection;
+  }
+
+  // Create a new connection if none exists
+  voiceConnection = joinVoiceChannel({
+    channelId: channel.id,
+    guildId: guild.id,
+    adapterCreator: channel.guild
+      .voiceAdapterCreator as DiscordGatewayAdapterCreator,
+    selfDeaf: false,
+  });
+
+  voiceConnection.on(VoiceConnectionStatus.Disconnected, () => {
+    console.log("Voice connection disconnected.");
+    // Clean up and remove the connection from the cache
+    client.voice.connections.delete(channel.guildId);
+  });
+
+  return voiceConnection;
 };

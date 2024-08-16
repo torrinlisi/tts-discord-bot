@@ -1,7 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-
-// hacky but works for now
-let isProcessing = false;
+import { CommandInteraction } from "discord.js";
 
 export const TTS = {
   data: new SlashCommandBuilder()
@@ -18,8 +16,12 @@ export const TTS = {
           { name: "Default Female Voice", value: "21m00Tcm4TlvDq8ikWAM" },
           { name: "Default Male Voice", value: "29vD33N1CtxCmqQRPOHJ" },
           {
-            name: "Female Radio/Stream Voice (I guess)",
-            value: "z9fAnlkpzviPz146aGWa",
+            name: "Albertinand",
+            value: "Yo20RdqMMwUUnwNTV5FD",
+          },
+          {
+            name: "Joby",
+            value: "ymsKIfampZ0Cerj1eruj",
           }
         )
     )
@@ -34,7 +36,7 @@ export const TTS = {
       option
         .setName("stability")
         .setRequired(false)
-        .setDescription("How emotional the voice is")
+        .setDescription("Variability in the voice, default is 'normal'")
         .addChoices(
           { name: "High", value: ".8" },
           { name: "Normal", value: ".5" },
@@ -49,7 +51,7 @@ export const TTS = {
       option
         .setName("style")
         .setRequired(false)
-        .setDescription("How emotional the voice is")
+        .setDescription("How emotional the voice is, default is 'kinda wild'")
         .addChoices(
           { name: "Wild", value: "1.0" },
           { name: "Medium Wild", value: ".75" },
@@ -62,11 +64,19 @@ export const TTS = {
         )
     ),
 
-  execute: async (interaction: any) => {
-    (global as any).queue.push(interaction);
+  execute: async (interaction: CommandInteraction) => {
+    const text = interaction.options.getString("text");
+    if (!!text && text.length <= 50) {
+      (global as any).queue.push(interaction);
 
-    interaction.reply({
-      content: "Added to queue",
-    });
+      interaction.reply({
+        content: "Added to queue",
+      });
+    } else {
+      interaction.reply({
+        content: "Message is too long, please keep it under 50 characters",
+        ephemeral: true,
+      });
+    }
   },
 };
