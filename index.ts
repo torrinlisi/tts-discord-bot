@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { Ping } from "./commands/ping";
 import { Voices } from "./commands/voices";
 import { TTS } from "./commands/tts";
+import { queueRunner } from "./common/queueRun";
 
 dotenv.config();
 const client = new Client({
@@ -16,6 +17,9 @@ const TOKEN: any = process.env["TOKEN"];
 const TEST_GUILD_ID = process.env["TEST_GUILD_ID"] || "";
 
 const commands = [Ping, TTS];
+
+// fighting with TS, doing this for now
+(global as any).queue = [];
 
 // When the client is ready, this only runs once
 client.once("ready", async () => {
@@ -45,6 +49,7 @@ client.once("ready", async () => {
         console.log(
           "Successfully registered application commands for development guild"
         );
+        queueRunner();
       }
     }
   } catch (error) {
