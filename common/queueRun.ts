@@ -83,7 +83,7 @@ export const queueRunner = async () => {
             player.on(AudioPlayerStatus.Idle, () => {
               console.log("The audio player is idle.");
               unlink(outputPath, () => {});
-              // connection.destroy(); // Disconnect the bot after the audio finishes
+              player.removeAllListeners();
             });
 
             player.on("error", (error) => {
@@ -92,8 +92,7 @@ export const queueRunner = async () => {
 
             connection.subscribe(player);
             player.play(audio);
-
-            player.removeAllListeners();
+            await timeout(2000);
           } else {
             console.error("Channel not found or not a voice channel");
           }

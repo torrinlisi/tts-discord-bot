@@ -20,8 +20,12 @@ export const TTS = {
             value: "Yo20RdqMMwUUnwNTV5FD",
           },
           {
-            name: "Joby",
+            name: "Joby (kind of)",
             value: "ymsKIfampZ0Cerj1eruj",
+          },
+          {
+            name: "Andy (kind of)",
+            value: "QBreCkJkNorI5ZUlmmhJ",
           }
         )
     )
