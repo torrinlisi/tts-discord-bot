@@ -70,7 +70,7 @@ export const TTS = {
 
   execute: async (interaction: CommandInteraction) => {
     const text = interaction.options.getString("text");
-    if (!!text && text.length <= 50) {
+    if (!!text && text.length <= 100) {
       (global as any).queue.push(interaction);
 
       interaction.reply({
@@ -78,7 +78,7 @@ export const TTS = {
       });
     } else {
       interaction.reply({
-        content: "Message is too long, please keep it under 50 characters",
+        content: "Message is too long, please keep it under 100 characters",
         ephemeral: true,
       });
     }
