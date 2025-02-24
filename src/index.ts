@@ -4,8 +4,9 @@ import { Client, Intents } from "discord.js";
 import dotenv from "dotenv";
 
 import { Ping } from "./commands/ping";
-import { Voices } from "./commands/voices";
+import { AlbertinandGotBack } from "./commands/albertinand-got-back";
 import { TTS } from "./commands/tts";
+// import { Skip } from "./commands/skip-current";
 import { queueRunner } from "./common/queueRun";
 
 dotenv.config();
@@ -16,7 +17,7 @@ const TOKEN: any = process.env["TOKEN"];
 // for testing only
 const TEST_GUILD_ID = process.env["TEST_GUILD_ID"] || "";
 
-const commands = [Ping, TTS];
+const commands = [Ping, TTS, AlbertinandGotBack /*, Skip*/];
 
 // fighting with TS, doing this for now
 (global as any).queue = [];
