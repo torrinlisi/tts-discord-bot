@@ -1,4 +1,4 @@
-# dnd-tts-discord-bot
+# tts-discord-bot
 
 Work ongoing.
 
