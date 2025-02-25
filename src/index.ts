@@ -26,9 +26,9 @@ const commands = [Ping, TTS, AlbertinandGotBack /*, Skip*/];
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user?.tag}!`);
   client.user?.setActivity(``);
-  client.user?.setUsername("TTS AI");
-  client.user?.setAvatar("./tempAIAvatar.png");
-  client.guilds.cache.get(TEST_GUILD_ID)?.setName("TTS AI");
+  // client.user?.setUsername("TTS AI");
+  // client.user?.setAvatar("./tempAIAvatar.jpg");
+  // client.guilds.cache.get(TEST_GUILD_ID)?.setName("TTS AI");
   // Registering the commands in the client
   const CLIENT_ID = client.user?.id;
   const rest = new REST({ version: "9" }).setToken(TOKEN);
