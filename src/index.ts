@@ -6,7 +6,8 @@ import dotenv from "dotenv";
 import { Ping } from "./commands/ping";
 import { AlbertinandGotBack } from "./commands/albertinand-got-back";
 import { TTS } from "./commands/tts";
-// import { Skip } from "./commands/skip-current";
+import { YTPlayer } from "./commands/yt-player";
+import { Skip } from "./commands/skip-current";
 import { queueRunner } from "./common/queueRun";
 
 dotenv.config();
@@ -17,7 +18,12 @@ const TOKEN: any = process.env["TOKEN"];
 // for testing only
 const TEST_GUILD_ID = process.env["TEST_GUILD_ID"] || "";
 
-const commands = [Ping, TTS, AlbertinandGotBack /*, Skip*/];
+let commands = [];
+if (process.env["ENV"] === "DEV") {
+  commands = [Ping, TTS, AlbertinandGotBack, YTPlayer, Skip];
+} else {
+  commands = [Ping, TTS, AlbertinandGotBack, Skip];
+}
 
 // fighting with TS, doing this for now
 (global as any).queue = [];

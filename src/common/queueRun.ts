@@ -13,15 +13,53 @@ import { randomUUID } from "crypto";
 import { CommandInteraction, Guild, GuildBasedChannel } from "discord.js";
 import { createWriteStream, unlink } from "fs";
 import { reverseLookup, VOICES, voices } from "./const";
+import { Downloader } from "ytdl-mp3";
+import ytdl from "@distube/ytdl-core";
 
 let voiceConnection: VoiceConnection;
+const maxSizeMB = 10;
 
 export const queueRunner = async () => {
   while (true) {
     if ((global as any).queue.length > 0 && !(global as any).isPlaying) {
       const interaction: CommandInteraction = (global as any).queue.shift();
 
-      if (interaction.commandName === "albertinand-got-back") {
+      if (interaction.commandName === "ytplayer") {
+        // ONLY WORKS WHEN RUNNING LOCALLY
+        try {
+          const url = interaction.options.getString("url") || "";
+
+          const info = await ytdl.getInfo(url);
+          const format = ytdl.chooseFormat(info.formats, {
+            quality: "highestaudio",
+          });
+
+          if (format.contentLength) {
+            const fileSizeMB = parseInt(format.contentLength) / (1024 * 1024);
+            if (fileSizeMB > maxSizeMB) {
+              throw new Error("File size too large, skipping download.");
+            }
+          }
+
+          const downloader = new Downloader({
+            getTags: false,
+            outputDir: "./audio",
+          });
+
+          const song = await downloader.downloadSong(url);
+          const outputName = song.outputFile.substring(
+            song.outputFile.indexOf("\\") + 1
+          );
+
+          await playAudio(interaction, `./audio/${outputName}`, 0.15, true);
+        } catch (e) {
+          console.log("e", e);
+          interaction.followUp({
+            content:
+              "Something went wrong downloading the file, it's probably too large",
+          });
+        }
+      } else if (interaction.commandName === "albertinand-got-back") {
         const song = interaction.options.getString("song");
         const audioPath = `./savedSounds/${song}`;
 
@@ -99,9 +137,40 @@ export const queueRunner = async () => {
   }
 };
 
-const waitForAudioToFinish = (player: AudioPlayer) =>
+const waitForAudioToFinish = (
+  player: AudioPlayer,
+  deleteAudio: boolean,
+  audioPath: string
+) =>
   new Promise<void>((resolve) => {
-    player.once(AudioPlayerStatus.Idle, () => resolve());
+    const checkSkip = () => {
+      if ((global as any).skip) {
+        (global as any).skip = false;
+        player.stop();
+      }
+    };
+
+    const interval = setInterval(checkSkip, 100);
+
+    player.once(AudioPlayerStatus.Idle, () => {
+      clearInterval(interval);
+      console.log("The audio player is idle.");
+      if (deleteAudio) {
+        setTimeout(() => {
+          unlink(audioPath, (err) => {
+            if (err) {
+              console.error("Error deleting file:", err);
+            } else {
+              console.log("File deleted successfully.");
+            }
+          });
+        }, 1000);
+      }
+
+      player.removeAllListeners();
+      (global as any).isPlaying = false;
+      resolve();
+    });
   });
 
 const timeout = (ms: number) => {
@@ -167,22 +236,13 @@ const playAudio = async (
 
     (global as any).isPlaying = true;
 
-    player.on(AudioPlayerStatus.Idle, () => {
-      console.log("The audio player is idle.");
-      if (deleteAudio) {
-        unlink(audioPath, () => {});
-      }
-      player.removeAllListeners();
-    });
-
     player.on("error", (error) => {
       console.error("Error with the audio player:", error);
     });
 
     connection.subscribe(player);
     player.play(audio);
-    await waitForAudioToFinish(player);
-    (global as any).isPlaying = false;
+    await waitForAudioToFinish(player, deleteAudio, audioPath);
   } else {
     console.error("Channel not found or not a voice channel");
   }

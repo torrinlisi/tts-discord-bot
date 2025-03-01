@@ -16,6 +16,7 @@
     "@discordjs/opus": "^0.10.0",
     "@discordjs/rest": "^0.4.1",
     "@discordjs/voice": "^0.17.0",
+    "@distube/ytdl-core": "^4.16.4",
     "axios": "^0.26.1",
     "discord-api-types": "^0.31.2",
     "discord.js": "^13.6.0",
@@ -24,7 +25,8 @@
     "libsodium-wrappers": "^0.7.13",
     "lodash.clonedeep": "^4.5.0",
     "pg": "^8.7.3",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "ytdl-mp3": "^5.2.1"
   },
   "devDependencies": {
     "@types/lodash.clonedeep": "^4.5.9",

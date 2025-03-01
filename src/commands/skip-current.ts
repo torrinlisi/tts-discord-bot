@@ -5,7 +5,7 @@ export const Skip = {
     .setName("skip")
     .setDescription("Skips current audio track"),
   execute: async (interaction: any) => {
-    (global as any).isPlaying = false;
+    (global as any).skip = true;
 
     interaction.reply({
       content: "Skipped audio track",
