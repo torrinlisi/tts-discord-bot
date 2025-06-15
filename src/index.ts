@@ -19,11 +19,11 @@ const TOKEN: any = process.env["TOKEN"];
 const TEST_GUILD_ID = process.env["TEST_GUILD_ID"] || "";
 
 let commands = [];
-if (process.env["ENV"] === "DEV") {
-  commands = [Ping, TTS, AlbertinandGotBack, YTPlayer, Skip];
-} else {
-  commands = [Ping, TTS, AlbertinandGotBack, Skip];
-}
+// if (process.env["ENV"] === "DEV") {
+// commands = [Ping, TTS, AlbertinandGotBack, YTPlayer, Skip];
+// } else {
+commands = [Ping, TTS, AlbertinandGotBack, Skip];
+// }
 
 // fighting with TS, doing this for now
 (global as any).queue = [];

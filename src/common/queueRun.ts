@@ -15,6 +15,7 @@ import { createWriteStream, unlink } from "fs";
 import { reverseLookup, VOICES, voices } from "./const";
 import { Downloader } from "ytdl-mp3";
 import ytdl from "@distube/ytdl-core";
+import { s3Upload } from "./trigger-s3-upload";
 
 let voiceConnection: VoiceConnection;
 const maxSizeMB = 10;
@@ -30,6 +31,16 @@ export const queueRunner = async () => {
           const url = interaction.options.getString("url") || "";
 
           const info = await ytdl.getInfo(url);
+
+          /* 
+            TODO: use this title and channelID to see if the file already exists in S3
+            if it does grab the music file in the s3 bucket rather than yt
+            
+            Then save the filename as `${title} - ${channelID}` rather than the default
+          */
+          console.log(info.videoDetails.title);
+          console.log(info.videoDetails.channelId);
+
           const format = ytdl.chooseFormat(info.formats, {
             quality: "highestaudio",
           });
@@ -50,6 +61,10 @@ export const queueRunner = async () => {
           const outputName = song.outputFile.substring(
             song.outputFile.indexOf("\\") + 1
           );
+
+          if (!!process.env.AWS_ACCESS_KEY_ID) {
+            s3Upload(`./audio/${outputName}`, outputName);
+          }
 
           await playAudio(interaction, `./audio/${outputName}`, 0.15, true);
         } catch (e) {

@@ -3,3 +3,7 @@ node_modules/
 testAudio.mp3
 dist
 connectionInstructions
+
+# yt player stuff that only works locally anyway
+*-base.js
+*-player-script.js
